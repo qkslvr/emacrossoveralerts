@@ -180,23 +180,23 @@ def main():
         crossover = check_ema_crossover(data_5m)
         
         if crossover is None:
-            message = "No crossover detected on 5m timeframe"
+            message = "<p>No crossover detected on 5m timeframe.</p>"
             send_telegram_alert(message)
             return
         
-        message = f"{crossover} crossover detected on 5m! Checking HTF alignment..."
+        message = f"<p>{crossover} crossover detected on 5m! Checking HTF alignment.</p>"
         send_telegram_alert(message)
         
         # Check higher timeframe alignment
         htf_data = check_htf_alignment(SYMBOL, crossover)
         
         if not htf_data["15m_aligned"]:
-            message = f"15m not aligned for {crossover} - skipping signal"
+            message = f"<p>15m not aligned for {crossover} - skipping signal</p>"
             send_telegram_alert(message)
             return
         
         if not htf_data["30m_aligned"]:
-            message = f"30m not aligned for {crossover} - skipping signal"
+            message = f"<p>30m not aligned for {crossover} - skipping signal</p>"
             send_telegram_alert(message)
             return
         
