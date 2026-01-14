@@ -13,9 +13,9 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 # Load environment variables
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+load_dotenv()
 
 BINANCE_API_KEY = os.getenv("API_KEY")
 BINANCE_API_SECRET = os.getenv("API_SECRET")
