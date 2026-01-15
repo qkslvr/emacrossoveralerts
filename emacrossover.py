@@ -143,23 +143,48 @@ def format_alert_message(direction: str, data_5m: dict, htf_data: dict) -> str:
     
     message = f"""{emoji} <b>EMA CROSSOVER ALERT - {direction}</b> {emoji}
 
-<b>Symbol:</b> {SYMBOL}
-<b>Signal Time:</b> {data_5m['close_time'].strftime('%Y-%m-%d %H:%M:%S')} UTC
-<b>Close Price:</b> ${data_5m['close_price']:,.2f}
+    <b>Symbol:</b> {SYMBOL}
+    <b>Signal Time:</b> {data_5m['close_time'].strftime('%Y-%m-%d %H:%M:%S')} UTC
+    <b>Close Price:</b> ${data_5m['close_price']:,.2f}
 
-<b>5m EMA Status:</b>
-• EMA{EMA_FAST}: {data_5m['ema_fast']:,.2f}
-• EMA{EMA_SLOW}: {data_5m['ema_slow']:,.2f}
+    <b>5m EMA Status:</b>
+    • EMA{EMA_FAST}: {data_5m['ema_fast']:,.2f}
+    • EMA{EMA_SLOW}: {data_5m['ema_slow']:,.2f}
 
-<b>15m EMA Alignment:</b> {'✅' if htf_data['15m_aligned'] else '❌'}
-• EMA{EMA_FAST}: {htf_data['15m_ema_fast']:,.2f}
-• EMA{EMA_SLOW}: {htf_data['15m_ema_slow']:,.2f}
+    <b>15m EMA Alignment:</b> {'✅' if htf_data['15m_aligned'] else '❌'}
+    • EMA{EMA_FAST}: {htf_data['15m_ema_fast']:,.2f}
+    • EMA{EMA_SLOW}: {htf_data['15m_ema_slow']:,.2f}
 
-<b>30m EMA Alignment:</b> {'✅' if htf_data['30m_aligned'] else '❌'}
-• EMA{EMA_FAST}: {htf_data['30m_ema_fast']:,.2f}
-• EMA{EMA_SLOW}: {htf_data['30m_ema_slow']:,.2f}
+    <b>30m EMA Alignment:</b> {'✅' if htf_data['30m_aligned'] else '❌'}
+    • EMA{EMA_FAST}: {htf_data['30m_ema_fast']:,.2f}
+    • EMA{EMA_SLOW}: {htf_data['30m_ema_slow']:,.2f}
 
-<i>All timeframes aligned - Signal confirmed!</i>"""
+    <i>All timeframes aligned - Signal confirmed!</i>"""
+    return message
+
+def format_alertFail_message(direction: str, data_5m: dict, htf_data: dict) -> str:
+    """Format the alert message for Telegram."""
+    emoji = "🟢" if direction == "LONG" else "🔴"
+    
+    message = f"""{emoji} <b>EMA CROSSOVER FAILED ALERT - {direction}</b> {emoji}
+
+    <b>Symbol:</b> {SYMBOL}
+    <b>Signal Time:</b> {data_5m['close_time'].strftime('%Y-%m-%d %H:%M:%S')} UTC
+    <b>Close Price:</b> ${data_5m['close_price']:,.2f}
+
+    <b>5m EMA Status:</b>
+    • EMA{EMA_FAST}: {data_5m['ema_fast']:,.2f}
+    • EMA{EMA_SLOW}: {data_5m['ema_slow']:,.2f}
+
+    <b>15m EMA Alignment:</b> {'✅' if htf_data['15m_aligned'] else '❌'}
+    • EMA{EMA_FAST}: {htf_data['15m_ema_fast']:,.2f}
+    • EMA{EMA_SLOW}: {htf_data['15m_ema_slow']:,.2f}
+
+    <b>30m EMA Alignment:</b> {'✅' if htf_data['30m_aligned'] else '❌'}
+    • EMA{EMA_FAST}: {htf_data['30m_ema_fast']:,.2f}
+    • EMA{EMA_SLOW}: {htf_data['30m_ema_slow']:,.2f}
+
+    """
     return message
 
 
@@ -186,17 +211,12 @@ def main():
         # Check higher timeframe alignment
         htf_data = check_htf_alignment(SYMBOL, crossover)
         
-        if not htf_data["15m_aligned"]:
-            message = f"⚠️ 15m not aligned for {crossover} - skipping signal"
-            print(message)
+        if not htf_data["15m_aligned"] or htf_data["30m_aligned"]:
+            message = format_alertFail_message(crossover,data_5m,htf_data)
             send_telegram_alert(message)
             return
         
-        if not htf_data["30m_aligned"]:
-            message = f"⚠️ 30m not aligned for {crossover} - skipping signal"
-            print(message)
-            send_telegram_alert(message)
-            return
+        
         
         # All conditions met - send alert
         print(f"All conditions met! Sending {crossover} alert...")
