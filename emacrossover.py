@@ -177,7 +177,6 @@ def main():
         if crossover is None:
             message = "No crossover detected on 5m timeframe."
             print(message)
-            send_telegram_alert(message)
             return
         
         message = f"🔔 {crossover} crossover detected on 5m! Checking HTF alignment..."
