@@ -6,19 +6,12 @@ EMA Crossover Alert System for BTCUSDT
 - Sends Telegram alerts for LONG/SHORT signals
 """
 
-import os
 import requests
 import pandas as pd
 from datetime import datetime, timezone
-from dotenv import load_dotenv
-
-# Load environment variables
-
-
-load_dotenv()
 
 TELEGRAM_BOT_TOKEN = "8460825078:AAFT6Py4U2CVjfltB9fwwftnP997OH5cJm8"
-TELEGRAM_CHANNEL_ID = "-4812164020"
+TELEGRAM_CHANNEL_ID = -4812164020
 BINANCE_API_KEY = "qqra4tvqlAHbvmxg1ZfxLJo5NyDUDeo3MvRhtdtzcUhMDlzPtPk9o1DrqdDHTGz2"
 BINANCE_SECRET_KEY = "JHXjCjl8ltzKFRqhDXXj5qyvZobE5NDQf32MM4hCcOfgtUIRlCc0KRlbjGWk9SWU"
 
@@ -134,8 +127,10 @@ def send_telegram_alert(message: str) -> bool:
     
     try:
         response = requests.post(url, json=payload)
-        response.raise_for_status()
-        print(f"Telegram alert sent successfully")
+        if not response.ok:
+            print(f"Telegram error: {response.status_code} - {response.text}")
+            return False
+        print("Telegram alert sent successfully")
         return True
     except requests.exceptions.RequestException as e:
         print(f"Failed to send Telegram alert: {e}")
@@ -146,8 +141,7 @@ def format_alert_message(direction: str, data_5m: dict, htf_data: dict) -> str:
     """Format the alert message for Telegram."""
     emoji = "🟢" if direction == "LONG" else "🔴"
     
-    message = f"""
-{emoji} <b>EMA CROSSOVER ALERT - {direction}</b> {emoji}
+    message = f"""{emoji} <b>EMA CROSSOVER ALERT - {direction}</b> {emoji}
 
 <b>Symbol:</b> {SYMBOL}
 <b>Signal Time:</b> {data_5m['close_time'].strftime('%Y-%m-%d %H:%M:%S')} UTC
@@ -165,8 +159,7 @@ def format_alert_message(direction: str, data_5m: dict, htf_data: dict) -> str:
 • EMA{EMA_FAST}: {htf_data['30m_ema_fast']:,.2f}
 • EMA{EMA_SLOW}: {htf_data['30m_ema_slow']:,.2f}
 
-<i>All timeframes aligned - Signal confirmed!</i>
-"""
+<i>All timeframes aligned - Signal confirmed!</i>"""
     return message
 
 
@@ -182,23 +175,27 @@ def main():
         crossover = check_ema_crossover(data_5m)
         
         if crossover is None:
-            message = "<p>No crossover detected on 5m timeframe.</p>"
+            message = "No crossover detected on 5m timeframe."
+            print(message)
             send_telegram_alert(message)
             return
         
-        message = f"<p>{crossover} crossover detected on 5m! Checking HTF alignment.</p>"
+        message = f"🔔 {crossover} crossover detected on 5m! Checking HTF alignment..."
+        print(message)
         send_telegram_alert(message)
         
         # Check higher timeframe alignment
         htf_data = check_htf_alignment(SYMBOL, crossover)
         
         if not htf_data["15m_aligned"]:
-            message = f"<p>15m not aligned for {crossover} - skipping signal</p>"
+            message = f"⚠️ 15m not aligned for {crossover} - skipping signal"
+            print(message)
             send_telegram_alert(message)
             return
         
         if not htf_data["30m_aligned"]:
-            message = f"<p>30m not aligned for {crossover} - skipping signal</p>"
+            message = f"⚠️ 30m not aligned for {crossover} - skipping signal"
+            print(message)
             send_telegram_alert(message)
             return
         
