@@ -203,7 +203,7 @@ def main():
         crossover = check_ema_crossover(data_5m)
         
         if crossover is None:
-            message = "No crossover detected on 5m timeframe."
+            message = f"No crossover detected on 5m timeframe.{TELEGRAM_CHANNEL_ID} "
             print(message)
             return
         
