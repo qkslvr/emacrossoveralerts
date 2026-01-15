@@ -6,14 +6,17 @@ EMA Crossover Alert System for BTCUSDT
 - Sends Telegram alerts for LONG/SHORT signals
 """
 
-import requests
+import requests, os
+from dotenv import load_dotenv
 import pandas as pd
 from datetime import datetime, timezone
 
-TELEGRAM_BOT_TOKEN = "8460825078:AAFT6Py4U2CVjfltB9fwwftnP997OH5cJm8"
-TELEGRAM_CHANNEL_ID = -4812164020
-BINANCE_API_KEY = "qqra4tvqlAHbvmxg1ZfxLJo5NyDUDeo3MvRhtdtzcUhMDlzPtPk9o1DrqdDHTGz2"
-BINANCE_SECRET_KEY = "JHXjCjl8ltzKFRqhDXXj5qyvZobE5NDQf32MM4hCcOfgtUIRlCc0KRlbjGWk9SWU"
+load_dotenv()
+
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHANNEL_ID = os.getenv('TELEGRAM_CHANNEL_ID')
+BINANCE_API_KEY = os.getenv('BINANCE_API_KEY')
+BINANCE_SECRET_KEY = os.getenv('BINANCE_SECRET_KEY')
 
 SYMBOL = "BTCUSDT"
 EMA_FAST = 30
