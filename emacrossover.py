@@ -203,7 +203,7 @@ def main():
         crossover = check_ema_crossover(data_5m)
         
         if crossover is None:
-            message = f"No crossover detected on 5m timeframe.{TELEGRAM_CHANNEL_ID} "
+            message = f"No crossover detected on 5m timeframe."
             print(message)
             return
         
@@ -214,7 +214,7 @@ def main():
         # Check higher timeframe alignment
         htf_data = check_htf_alignment(SYMBOL, crossover)
         
-        if not htf_data["15m_aligned"] or htf_data["30m_aligned"]:
+        if not htf_data["15m_aligned"] or not htf_data["30m_aligned"]:
             message = format_alertFail_message(crossover,data_5m,htf_data)
             send_telegram_alert(message)
             return
